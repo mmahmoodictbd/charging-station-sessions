@@ -1,6 +1,5 @@
 package com.unloadbrain.assignement.evbox.service;
 
-import com.unloadbrain.assignement.evbox.dto.request.ChargingSessionCreateRequest;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStartedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSummeryResponse;
@@ -17,7 +16,7 @@ public class ChargingSessionService {
     public ChargingSessionService() {
     }
 
-    public IdentityResponse createSession(ChargingSessionCreateRequest chargingSessionCreateRequest) {
+    public IdentityResponse createSession() {
         return null;
     }
 

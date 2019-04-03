@@ -1,25 +1,19 @@
 package com.unloadbrain.assignement.evbox.controller;
 
-import com.unloadbrain.assignement.evbox.dto.request.ChargingSessionCreateRequest;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStartedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
-import com.unloadbrain.assignement.evbox.exception.ValidationException;
 import com.unloadbrain.assignement.evbox.service.ChargingSessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 
 @Slf4j
@@ -33,16 +27,8 @@ public class ChargingSessionController {
     }
 
     @PostMapping("/chargingSession")
-    public ResponseEntity<IdentityResponse> createChargingSession(
-            @RequestBody @Valid ChargingSessionCreateRequest chargingSessionCreateRequest,
-            BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
-
-        return new ResponseEntity(
-                chargingSessionService.createSession(chargingSessionCreateRequest), HttpStatus.CREATED);
+    public ResponseEntity<IdentityResponse> createChargingSession() {
+        return new ResponseEntity(chargingSessionService.createSession(), HttpStatus.CREATED);
     }
 
     @PutMapping("/chargingSession/{id}")

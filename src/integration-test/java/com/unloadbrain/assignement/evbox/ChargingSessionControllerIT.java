@@ -18,16 +18,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,14 +51,22 @@ public class ChargingSessionControllerIT {
     @Test
     public void shouldCreateChargingSession() throws Exception {
 
-        when(chargingSessionServiceMock.createSession(any())).thenReturn(new IdentityResponse("uuid"));
+        when(chargingSessionServiceMock.createSession()).thenReturn(new IdentityResponse("uuid"));
 
-        mockMvc.perform(post("/chargingSession")
-                .content("{ \"stationId\": \"stations1\" }")
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        mockMvc.perform(post("/chargingSession"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(not(empty()))))
+                .andExpect(jsonPath("$.id").value("uuid"))
+                .andDo(print());
+    }
+
+    @Test
+    public void shouldStopChargingSession() throws Exception {
+
+        doNothing().when(chargingSessionServiceMock).stopSession(anyString());
+
+        mockMvc.perform(put("/chargingSession/uuid"))
+                .andExpect(status().isNoContent())
                 .andDo(print());
     }
 
