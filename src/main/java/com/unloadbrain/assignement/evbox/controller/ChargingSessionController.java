@@ -55,7 +55,7 @@ public class ChargingSessionController {
 
     @DeleteMapping("/chargingSessions")
     public ResponseEntity<Void> deleteStoppedChargingSessions() {
-        chargingSessionService.deleteStoppedChargingSessions();
+        chargingSessionService.deleteStoppedSessions();
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

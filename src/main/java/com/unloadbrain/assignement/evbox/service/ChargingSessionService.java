@@ -1,40 +1,87 @@
 package com.unloadbrain.assignement.evbox.service;
 
+import com.unloadbrain.assignement.evbox.domain.model.ChargingSession;
+import com.unloadbrain.assignement.evbox.domain.repository.ChargingSessionRepository;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStartedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
+import com.unloadbrain.assignement.evbox.events.ChargingSessionFinishedEvent;
+import com.unloadbrain.assignement.evbox.events.ChargingSessionStartedEvent;
+import com.unloadbrain.assignement.evbox.exception.ChargingSessionNotFoundException;
+import com.unloadbrain.assignement.evbox.service.timewheel.SessionCountTimeWheel;
+import com.unloadbrain.assignement.evbox.util.DateUtil;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-
-import java.time.format.DateTimeFormatter;
 
 @Service
 public class ChargingSessionService {
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private ChargingSessionRepository chargingSessionRepository;
+    private LoggedInUserService loggedInUserService;
+    private SessionCountTimeWheel sessionCountTimeWheel;
+    private ApplicationEventPublisher applicationEventPublisher;
+    private DateUtil dateUtil;
 
-    public ChargingSessionService() {
+    public ChargingSessionService(ChargingSessionRepository chargingSessionRepository,
+                                  LoggedInUserService loggedInUserService,
+                                  SessionCountTimeWheel sessionCountTimeWheel,
+                                  ApplicationEventPublisher applicationEventPublisher,
+                                  DateUtil dateUtil) {
+        this.chargingSessionRepository = chargingSessionRepository;
+        this.loggedInUserService = loggedInUserService;
+        this.sessionCountTimeWheel = sessionCountTimeWheel;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.dateUtil = dateUtil;
     }
 
     public IdentityResponse createSession() {
-        return null;
+
+        ChargingSession chargingSession = new ChargingSession();
+        chargingSession.setStationId(loggedInUserService.getLoggedInUserStationId());
+        chargingSession.setStartedAt(dateUtil.getCurrentDate());
+        chargingSessionRepository.save(chargingSession);
+
+        applicationEventPublisher.publishEvent(new ChargingSessionStartedEvent(chargingSession));
+
+        return new IdentityResponse(chargingSession.getId());
     }
 
     public void stopSession(String id) {
+
+        ChargingSession chargingSession = chargingSessionRepository.get(id);
+        if (chargingSession == null) {
+            throw new ChargingSessionNotFoundException(String.format("Charging session %s not found.", id));
+        }
+
+        chargingSession.setEndedAt(dateUtil.getCurrentDate());
+        chargingSessionRepository.save(chargingSession);
+
+        applicationEventPublisher.publishEvent(new ChargingSessionFinishedEvent(chargingSession));
+    }
+
+    public void deleteStoppedSessions() {
+        chargingSessionRepository.deleteAllFinishedSession();
     }
 
     public ChargingSessionsSummeryResponse getSessionSummery() {
-        return null;
-    }
-
-    public void deleteStoppedChargingSessions() {
-    }
-
-    public ChargingStoppedSessionsSummeryResponse getStoppedSessionSummery() {
-        return null;
+        return ChargingSessionsSummeryResponse.builder()
+                .startedCount(sessionCountTimeWheel.getTotalSessionsStartedInLast60Seconds())
+                .stoppedCount(sessionCountTimeWheel.getTotalFinishedSessionsInLast60Seconds())
+                .totalCount(sessionCountTimeWheel.getTotalOngoingSessionsInLast60Seconds())
+                .build();
     }
 
     public ChargingStartedSessionsSummeryResponse getStartedSessionSummery() {
-        return null;
+        return ChargingStartedSessionsSummeryResponse.builder()
+                .startedCount(sessionCountTimeWheel.getTotalSessionsStartedInLast60Seconds())
+                .build();
     }
+
+    public ChargingStoppedSessionsSummeryResponse getStoppedSessionSummery() {
+        return ChargingStoppedSessionsSummeryResponse.builder()
+                .stoppedCount(sessionCountTimeWheel.getTotalFinishedSessionsInLast60Seconds())
+                .build();
+    }
+
 }
