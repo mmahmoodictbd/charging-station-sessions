@@ -1,0 +1,36 @@
+@startuml
+
+actor "Authenticated User" as User
+participant "Web APIs" as WebAPIs
+participant ChargingSessionService as CSS
+participant ChargingSessionStatisticsService as CSSS
+database "In-memory repository" as DomainDataStore
+database "Time Wheel" as TimeWheel
+
+== Create Session ==
+
+User -> WebAPIs : create session
+WebAPIs -> CSS
+CSS --> TimeWheel : publish start session async event
+CSS -> DomainDataStore : save session info in DB
+CSS --> WebAPIs : returns session id
+WebAPIs --> User : HTTP OK
+
+== Stop Session ==
+
+User -> WebAPIs : stop session
+WebAPIs -> CSS
+CSS --> TimeWheel : publish stop session async event
+CSS -> DomainDataStore : save session info in DB
+CSS --> WebAPIs
+WebAPIs --> User : HTTP NoContent
+
+== Get Summery ==
+
+User -> WebAPIs : get summery
+WebAPIs -> CSSS
+CSSS --> TimeWheel : get info from time wheel
+CSSS --> WebAPIs
+WebAPIs --> User : HTTP OK
+
+@enduml
