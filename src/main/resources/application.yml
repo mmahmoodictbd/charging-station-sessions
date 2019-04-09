@@ -1,10 +1,5 @@
 ### Common
 
-server:
-  port: 8080
-  tomcat:
-    max-threads: 4
-
 spring:
   application:
     name: EvboxChargingStationSession
