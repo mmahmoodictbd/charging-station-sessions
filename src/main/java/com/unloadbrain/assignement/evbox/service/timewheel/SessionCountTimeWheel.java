@@ -1,7 +1,5 @@
 package com.unloadbrain.assignement.evbox.service.timewheel;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,9 +9,9 @@ import java.util.TimerTask;
 public class SessionCountTimeWheel {
 
     private final static int WHEEL_SIZE = 60;
-    private final static long WHEEL_ROTATION_SPEED = 5000;
+    private final static long WHEEL_ROTATION_SPEED = 1000;
 
-    private static SessionCountTimeWheel timeWheel = new SessionCountTimeWheel();
+    private static SessionCountTimeWheel instance = new SessionCountTimeWheel();
 
     private WheelSpoke head;
     private WheelSpoke end;
@@ -50,7 +48,7 @@ public class SessionCountTimeWheel {
      * @return
      */
     public static SessionCountTimeWheel instance() {
-        return timeWheel;
+        return instance;
     }
 
     private void spinWheel() {
@@ -121,22 +119,6 @@ public class SessionCountTimeWheel {
         }
 
         return finishedSessionCount;
-    }
-
-    /**
-     * Return tine wheel as list
-     *
-     * @return
-     */
-    public List<WheelSpoke> asList() {
-        List<WheelSpoke> spokes = new ArrayList<>(WHEEL_SIZE);
-        WheelSpoke currentPointer = head;
-        while (currentPointer != null) {
-            spokes.add(currentPointer);
-            currentPointer = currentPointer.getNext();
-        }
-
-        return spokes;
     }
 
 }

@@ -20,20 +20,31 @@ public class ChargingSessionRepository {
 
     public ChargingSession save(ChargingSession chargingSession) {
 
+        if (chargingSession.getEndedAt() != null) {
+            startedSessions.remove(chargingSession);
+            stoppedSessions.put(chargingSession.getId(), chargingSession);
+            return chargingSession;
+        }
+
         if (chargingSession.getId() == null) {
             String id = uuidUtil.getRandomUuid();
             chargingSession.setId(id);
             startedSessions.put(id, chargingSession);
         } else {
-            startedSessions.remove(chargingSession);
-            stoppedSessions.put(chargingSession.getId(), chargingSession);
+            startedSessions.put(chargingSession.getId(), chargingSession);
         }
+
+
 
         return chargingSession;
     }
 
     public ChargingSession get(String id) {
         return startedSessions.get(id);
+    }
+
+    public ChargingSession getStoppedSession(String id) {
+        return stoppedSessions.get(id);
     }
 
     public void deleteAllFinishedSession() {

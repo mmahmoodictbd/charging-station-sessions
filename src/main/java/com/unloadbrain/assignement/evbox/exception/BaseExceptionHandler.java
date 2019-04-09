@@ -21,7 +21,7 @@ public abstract class BaseExceptionHandler {
     @ResponseBody
     public ErrorResponse handleThrowable(final Throwable ex) {
         log.error("Unexpected error", ex);
-        return new ErrorResponse("INTERNAL_SERVER_ERROR", "An unexpected internal server error occured");
+        return new ErrorResponse("INTERNAL_SERVER_ERROR", "An unexpected internal server error occurred");
     }
 
     @Data

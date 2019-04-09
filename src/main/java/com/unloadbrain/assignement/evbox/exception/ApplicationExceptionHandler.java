@@ -15,18 +15,10 @@ public class ApplicationExceptionHandler extends BaseExceptionHandler {
         super(log);
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Throwable.class)
-    @ResponseBody
-    public ErrorResponse handleThrowable(final Throwable ex) {
-        log.error("Unexpected error", ex);
-        return new ErrorResponse("INTERNAL_SERVER_ERROR", "An unexpected internal server error occured");
-    }
-
     @ExceptionHandler(ChargingSessionNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ErrorResponse handleUserNotFoundException(final ChargingSessionNotFoundException ex) {
+    public ErrorResponse handleSessionNotFoundException(final ChargingSessionNotFoundException ex) {
         log.error("Session not found thrown ", ex);
         return new ErrorResponse("SESSION_NOT_FOUND", "The session was not found");
     }
