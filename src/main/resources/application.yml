@@ -1,0 +1,57 @@
+### Common
+
+server:
+  port: 8080
+  tomcat:
+    max-threads: 4
+
+spring:
+  application:
+    name: EvboxChargingStationSession
+  profiles:
+    active: dev
+  resources:
+    add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+logging:
+  level:
+    root: INFO
+
+---
+
+### Dev profile
+
+spring:
+  profiles: dev
+
+logging:
+  level:
+    com.unloadbrain: DEBUG
+
+---
+
+### Prod profile
+
+spring:
+  profiles: prod
+
+logging:
+  level:
+    com.unloadbrain: INFO
+
+---
+
+### Integration test profile
+
+spring:
+  profiles: it
+  main:
+    allow-bean-definition-overriding: true
+
+
+
+
+
+

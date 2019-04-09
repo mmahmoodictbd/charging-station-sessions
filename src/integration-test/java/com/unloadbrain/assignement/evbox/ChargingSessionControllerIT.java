@@ -1,10 +1,10 @@
 package com.unloadbrain.assignement.evbox;
 
-import com.unloadbrain.assignement.evbox.controller.ChargingSessionController;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStartedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
+import com.unloadbrain.assignement.evbox.exception.ChargingSessionNotFoundException;
 import com.unloadbrain.assignement.evbox.service.ChargingSessionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,14 +12,18 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -32,20 +36,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = {Application.class, ChargingSessionControllerIT.TestConfig.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("it")
 public class ChargingSessionControllerIT {
 
     @Autowired
+    private WebApplicationContext context;
+
+    @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
     private ChargingSessionService chargingSessionServiceMock;
 
     @Before
     public void setup() {
-        this.chargingSessionServiceMock = mock(ChargingSessionService.class);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new ChargingSessionController(chargingSessionServiceMock)).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
     @Test
@@ -67,6 +74,19 @@ public class ChargingSessionControllerIT {
 
         mockMvc.perform(put("/chargingSession/uuid"))
                 .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenStopChargingSessionIdNotFound() throws Exception {
+
+        doThrow(new ChargingSessionNotFoundException("Charging session uuid not found."))
+                .when(chargingSessionServiceMock).stopSession("uuid");
+
+        mockMvc.perform(put("/chargingSession/uuid"))
+                //.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("SESSION_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("The session was not found"))
                 .andDo(print());
     }
 
@@ -114,11 +134,21 @@ public class ChargingSessionControllerIT {
     @Test
     public void shouldDeleteStoppedSessionsSummery() throws Exception {
 
-        doNothing().when(chargingSessionServiceMock).deleteStoppedChargingSessions();
+        doNothing().when(chargingSessionServiceMock).deleteStoppedSessions();
 
         mockMvc.perform(delete("/chargingSessions"))
                 .andExpect(status().isNoContent())
                 .andDo(print());
+    }
+
+    @Configuration
+    static class TestConfig {
+
+        @Bean
+        public ChargingSessionService chargingSessionService() {
+            return mock(ChargingSessionService.class);
+        }
+
     }
 
 }
