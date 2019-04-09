@@ -6,6 +6,7 @@ import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSum
 import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
 import com.unloadbrain.assignement.evbox.exception.ChargingSessionNotFoundException;
 import com.unloadbrain.assignement.evbox.service.ChargingSessionService;
+import com.unloadbrain.assignement.evbox.service.ChargingSessionStatisticsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +51,9 @@ public class ChargingSessionControllerIT {
     @Autowired
     private ChargingSessionService chargingSessionServiceMock;
 
+    @Autowired
+    private ChargingSessionStatisticsService chargingSessionStatisticsServiceMock;
+
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
@@ -93,7 +97,7 @@ public class ChargingSessionControllerIT {
     @Test
     public void shouldReturnChargingSessionSummery() throws Exception {
 
-        when(chargingSessionServiceMock.getSessionSummery()).thenReturn(
+        when(chargingSessionStatisticsServiceMock.getSessionSummery()).thenReturn(
                 ChargingSessionsSummeryResponse.builder().startedCount(1L).stoppedCount(2L).totalCount(3L).build());
 
         mockMvc.perform(get("/chargingSessions"))
@@ -108,7 +112,7 @@ public class ChargingSessionControllerIT {
     @Test
     public void shouldReturnChargingStartedSessionSummery() throws Exception {
 
-        when(chargingSessionServiceMock.getStartedSessionSummery()).thenReturn(
+        when(chargingSessionStatisticsServiceMock.getStartedSessionSummery()).thenReturn(
                 ChargingStartedSessionsSummeryResponse.builder().startedCount(1L).build());
 
         mockMvc.perform(get("/chargingSessions/started"))
@@ -121,7 +125,7 @@ public class ChargingSessionControllerIT {
     @Test
     public void shouldReturnChargingStoppedSessionSummery() throws Exception {
 
-        when(chargingSessionServiceMock.getStoppedSessionSummery()).thenReturn(
+        when(chargingSessionStatisticsServiceMock.getStoppedSessionSummery()).thenReturn(
                 ChargingStoppedSessionsSummeryResponse.builder().stoppedCount(1L).build());
 
         mockMvc.perform(get("/chargingSessions/stopped"))
@@ -147,6 +151,11 @@ public class ChargingSessionControllerIT {
         @Bean
         public ChargingSessionService chargingSessionService() {
             return mock(ChargingSessionService.class);
+        }
+
+        @Bean
+        public ChargingSessionStatisticsService chargingSessionStatisticsService() {
+            return mock(ChargingSessionStatisticsService.class);
         }
 
     }

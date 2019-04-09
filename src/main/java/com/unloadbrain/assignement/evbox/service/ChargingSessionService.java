@@ -2,14 +2,10 @@ package com.unloadbrain.assignement.evbox.service;
 
 import com.unloadbrain.assignement.evbox.domain.model.ChargingSession;
 import com.unloadbrain.assignement.evbox.domain.repository.ChargingSessionRepository;
-import com.unloadbrain.assignement.evbox.dto.response.ChargingSessionsSummeryResponse;
-import com.unloadbrain.assignement.evbox.dto.response.ChargingStartedSessionsSummeryResponse;
-import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
 import com.unloadbrain.assignement.evbox.events.ChargingSessionFinishedEvent;
 import com.unloadbrain.assignement.evbox.events.ChargingSessionStartedEvent;
 import com.unloadbrain.assignement.evbox.exception.ChargingSessionNotFoundException;
-import com.unloadbrain.assignement.evbox.service.timewheel.SessionCountTimeWheel;
 import com.unloadbrain.assignement.evbox.util.DateUtil;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -19,18 +15,15 @@ public class ChargingSessionService {
 
     private ChargingSessionRepository chargingSessionRepository;
     private LoggedInUserService loggedInUserService;
-    private SessionCountTimeWheel sessionCountTimeWheel;
     private ApplicationEventPublisher applicationEventPublisher;
     private DateUtil dateUtil;
 
     public ChargingSessionService(ChargingSessionRepository chargingSessionRepository,
                                   LoggedInUserService loggedInUserService,
-                                  SessionCountTimeWheel sessionCountTimeWheel,
                                   ApplicationEventPublisher applicationEventPublisher,
                                   DateUtil dateUtil) {
         this.chargingSessionRepository = chargingSessionRepository;
         this.loggedInUserService = loggedInUserService;
-        this.sessionCountTimeWheel = sessionCountTimeWheel;
         this.applicationEventPublisher = applicationEventPublisher;
         this.dateUtil = dateUtil;
     }
@@ -62,26 +55,6 @@ public class ChargingSessionService {
 
     public void deleteStoppedSessions() {
         chargingSessionRepository.deleteAllFinishedSession();
-    }
-
-    public ChargingSessionsSummeryResponse getSessionSummery() {
-        return ChargingSessionsSummeryResponse.builder()
-                .startedCount(sessionCountTimeWheel.getTotalSessionsStartedInLast60Seconds())
-                .stoppedCount(sessionCountTimeWheel.getTotalFinishedSessionsInLast60Seconds())
-                .totalCount(sessionCountTimeWheel.getTotalOngoingSessionsInLast60Seconds())
-                .build();
-    }
-
-    public ChargingStartedSessionsSummeryResponse getStartedSessionSummery() {
-        return ChargingStartedSessionsSummeryResponse.builder()
-                .startedCount(sessionCountTimeWheel.getTotalSessionsStartedInLast60Seconds())
-                .build();
-    }
-
-    public ChargingStoppedSessionsSummeryResponse getStoppedSessionSummery() {
-        return ChargingStoppedSessionsSummeryResponse.builder()
-                .stoppedCount(sessionCountTimeWheel.getTotalFinishedSessionsInLast60Seconds())
-                .build();
     }
 
 }

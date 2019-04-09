@@ -5,6 +5,7 @@ import com.unloadbrain.assignement.evbox.dto.response.ChargingStartedSessionsSum
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
 import com.unloadbrain.assignement.evbox.service.ChargingSessionService;
+import com.unloadbrain.assignement.evbox.service.ChargingSessionStatisticsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChargingSessionController {
 
     private final ChargingSessionService chargingSessionService;
+    private final ChargingSessionStatisticsService chargingSessionStatisticsService;
 
-    public ChargingSessionController(ChargingSessionService chargingSessionService) {
+    public ChargingSessionController(ChargingSessionService chargingSessionService,
+                                     ChargingSessionStatisticsService chargingSessionStatisticsService) {
         this.chargingSessionService = chargingSessionService;
+        this.chargingSessionStatisticsService = chargingSessionStatisticsService;
     }
 
     @PostMapping("/chargingSession")
@@ -38,24 +42,26 @@ public class ChargingSessionController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/chargingSessions")
-    public ChargingSessionsSummeryResponse getSessionSummery() {
-        return chargingSessionService.getSessionSummery();
-    }
-
-    @GetMapping("/chargingSessions/started")
-    public ChargingStartedSessionsSummeryResponse getStartedSessionSummery() {
-        return chargingSessionService.getStartedSessionSummery();
-    }
-
-    @GetMapping("/chargingSessions/stopped")
-    public ChargingStoppedSessionsSummeryResponse getStoppedSessionSummery() {
-        return chargingSessionService.getStoppedSessionSummery();
-    }
-
     @DeleteMapping("/chargingSessions")
     public ResponseEntity<Void> deleteStoppedChargingSessions() {
         chargingSessionService.deleteStoppedSessions();
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+    
+    @GetMapping("/chargingSessions")
+    public ChargingSessionsSummeryResponse getSessionSummery() {
+        return chargingSessionStatisticsService.getSessionSummery();
+    }
+
+    @GetMapping("/chargingSessions/started")
+    public ChargingStartedSessionsSummeryResponse getStartedSessionSummery() {
+        return chargingSessionStatisticsService.getStartedSessionSummery();
+    }
+
+    @GetMapping("/chargingSessions/stopped")
+    public ChargingStoppedSessionsSummeryResponse getStoppedSessionSummery() {
+        return chargingSessionStatisticsService.getStoppedSessionSummery();
+    }
+
+
 }
