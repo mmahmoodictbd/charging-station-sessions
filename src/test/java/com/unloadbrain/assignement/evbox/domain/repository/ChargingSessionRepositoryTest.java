@@ -75,10 +75,10 @@ public class ChargingSessionRepositoryTest {
         repository.save(chargingSession);
 
         // When
-        repository.getStoppedSession("uuid1");
+        ChargingSession persistedChargingSession = repository.getStoppedSession("uuid1");
 
         // Then
-        assertNotNull(repository.getStoppedSession("uuid1"));
+        assertNotNull(persistedChargingSession);
     }
 
     @Test

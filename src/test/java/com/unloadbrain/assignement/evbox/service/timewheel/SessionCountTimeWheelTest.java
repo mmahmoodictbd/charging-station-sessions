@@ -63,6 +63,8 @@ public class SessionCountTimeWheelTest {
         timeWheel.increaseSessionStartedCount();
         timeWheel.increaseSessionStartedCount();
         timeWheel.increaseSessionFinishedCount();
+
+        //TODO: Making SessionCountTimeWheel class configuration will help running this test faster.
         Thread.sleep(61000);
 
         // Then
