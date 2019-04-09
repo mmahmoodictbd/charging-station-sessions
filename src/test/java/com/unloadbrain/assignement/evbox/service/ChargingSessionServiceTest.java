@@ -6,7 +6,6 @@ import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
 import com.unloadbrain.assignement.evbox.events.ChargingSessionFinishedEvent;
 import com.unloadbrain.assignement.evbox.events.ChargingSessionStartedEvent;
 import com.unloadbrain.assignement.evbox.exception.ChargingSessionNotFoundException;
-import com.unloadbrain.assignement.evbox.service.timewheel.SessionCountTimeWheel;
 import com.unloadbrain.assignement.evbox.util.DateUtil;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +30,6 @@ public class ChargingSessionServiceTest {
 
     private ChargingSessionRepository chargingSessionRepository;
     private LoggedInUserService loggedInUserService;
-    private SessionCountTimeWheel sessionCountTimeWheel;
     private ApplicationEventPublisher applicationEventPublisher;
     private DateUtil dateUtil;
 
@@ -41,11 +39,10 @@ public class ChargingSessionServiceTest {
 
         chargingSessionRepository = mock(ChargingSessionRepository.class);
         loggedInUserService = mock(LoggedInUserService.class);
-        sessionCountTimeWheel = mock(SessionCountTimeWheel.class);
         applicationEventPublisher = mock(ApplicationEventPublisher.class);
         dateUtil = mock(DateUtil.class);
 
-        chargingSessionService = new ChargingSessionService(chargingSessionRepository,
+        chargingSessionService = new ChargingSessionInMemoryService(chargingSessionRepository,
                 loggedInUserService, applicationEventPublisher, dateUtil);
     }
 

@@ -5,7 +5,9 @@ import com.unloadbrain.assignement.evbox.dto.response.ChargingStartedSessionsSum
 import com.unloadbrain.assignement.evbox.dto.response.ChargingStoppedSessionsSummeryResponse;
 import com.unloadbrain.assignement.evbox.dto.response.IdentityResponse;
 import com.unloadbrain.assignement.evbox.exception.ChargingSessionNotFoundException;
+import com.unloadbrain.assignement.evbox.service.ChargingSessionInMemoryService;
 import com.unloadbrain.assignement.evbox.service.ChargingSessionService;
+import com.unloadbrain.assignement.evbox.service.ChargingSessionStatisticsInMemoryService;
 import com.unloadbrain.assignement.evbox.service.ChargingSessionStatisticsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -148,14 +151,16 @@ public class ChargingSessionControllerIT {
     @Configuration
     static class TestConfig {
 
+        @Primary
         @Bean
         public ChargingSessionService chargingSessionService() {
-            return mock(ChargingSessionService.class);
+            return mock(ChargingSessionInMemoryService.class);
         }
 
+        @Primary
         @Bean
         public ChargingSessionStatisticsService chargingSessionStatisticsService() {
-            return mock(ChargingSessionStatisticsService.class);
+            return mock(ChargingSessionStatisticsInMemoryService.class);
         }
 
     }

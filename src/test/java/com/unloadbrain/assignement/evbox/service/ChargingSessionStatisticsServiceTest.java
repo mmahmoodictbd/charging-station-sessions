@@ -22,7 +22,7 @@ public class ChargingSessionStatisticsServiceTest {
 
     public ChargingSessionStatisticsServiceTest() {
         sessionCountTimeWheel = mock(SessionCountTimeWheel.class);
-        chargingSessionStatisticsService = new ChargingSessionStatisticsService(sessionCountTimeWheel);
+        chargingSessionStatisticsService = new ChargingSessionStatisticsInMemoryService(sessionCountTimeWheel);
     }
 
     @Test
