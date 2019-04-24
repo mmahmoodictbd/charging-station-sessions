@@ -1,5 +1,9 @@
 # EVBOX Charging Station Sessions APIs
 
+##### Motivation
+This project was an assignment. Implemented code would be a nice example of real-time summery generation and how to impletement circular queue / ring buffer.
+
+### Features
 EVBox Charging Station Sessions APIs provides
 - Create session.
 - Stop session.
